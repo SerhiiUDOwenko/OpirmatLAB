@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ОпірМат Лаб — Інтерактивний посібник та симулятор</title>
+<style>
+  :root {
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --bg-card-hover: #334155;
+    --border-color: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #38bdf8;
+    --accent-indigo: #818cf8;
+    --accent-emerald: #34d399;
+    --accent-amber: #fbbf24;
+    --accent-rose: #f43f5e;
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    background-color: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .logo-block {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+  }
+
+  .logo-text h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .logo-text p {
+    font-size: 0.75rem;
+    color: var(--accent-blue);
+    font-weight: 500;
+  }
+
+  nav {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .nav-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    padding: 0.45rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .nav-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-card);
+  }
+
+  .nav-btn.active {
+    color: #0f172a;
+    background-color: var(--accent-blue);
+    font-weight: 600;
+  }
+
+  main {
+    flex: 1;
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.25s ease-in-out;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+  }
+
+  .card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-header h2, .card-header h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .badge-blue { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+  .badge-emerald { background: rgba(52, 211, 153, 0.15); color: var(--accent-emerald); }
+  .badge-indigo { background: rgba(129, 140, 248, 0.15); color: var(--accent-indigo); }
+  .badge-amber { background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); }
+  .badge-rose { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+
+  .formula-box {
+    background-color: #0b1120;
+    border-left: 3px solid var(--accent-blue);
+    padding: 0.85rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.85rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .formula-box .comment {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-family: var(--font-sans);
+  }
+
+  .formula-highlight {
+    color: var(--accent-emerald);
+    font-weight: 600;
+  }
+
+  .control-group {
+    margin-bottom: 1rem;
+  }
+
+  .control-group label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+  }
+
+  .control-group label span.val {
+    color: var(--accent-blue);
+    font-weight: 600;
+    font-family: var(--font-mono);
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 6px;
+    background: #334155;
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+  }
+
+  select, input[type="number"], input[type="text"] {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  select:focus, input:focus {
+    border-color: var(--accent-blue);
+  }
+
+  .plot-container {
+    background: #0b1120;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin: 1rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .result-banner {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .result-item {
+    background: #1e293b;
+    padding: 0.6rem;
+    border-radius: 6px;
+    border-left: 2px solid var(--accent-indigo);
+  }
+
+  .result-item .label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .result-item .value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin: 1rem 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    text-align: left;
+  }
+
+  th {
+    background-color: #1e293b;
+    color: var(--accent-blue);
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+  }
+
+  tr:hover td {
+    background-color: rgba(51, 65, 85, 0.3);
+    color: var(--text-primary);
+  }
+
+  .quiz-option {
+    background: #1e293b;
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .quiz-option:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+    background: #334155;
+  }
+
+  .quiz-option.correct {
+    border-color: var(--accent-emerald);
+    background: rgba(52, 211, 153, 0.15);
+    color: #a7f3d0;
+  }
+
+  .quiz-option.wrong {
+    border-color: var(--accent-rose);
+    background: rgba(244, 63, 94, 0.15);
+    color: #fecdd3;
+  }
+
+  .quiz-feedback {
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    display: none;
+  }
+
+  .topic-item {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    background: var(--bg-card);
+    overflow: hidden;
+  }
+
+  .topic-header {
+    padding: 0.85rem 1.25rem;
+    background: #1e293b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .topic-header:hover {
+    background: #273549;
+  }
+
+  .topic-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .topic-body {
+    padding: 1.25rem;
+    border-top: 1px solid var(--border-color);
+    display: none;
+    font-size: 0.925rem;
+    color: #cbd5e1;
+  }
+
+  .topic-body.open {
+    display: block;
+  }
+
+  .diagram-box {
+    background: #0b1120;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+  }
+
+  .tip-box {
+    background: rgba(56, 189, 248, 0.08);
+    border-left: 3px solid var(--accent-blue);
+    padding: 0.75rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin: 0.85rem 0;
+    font-size: 0.875rem;
+    color: #bae6fd;
+  }
+
+  .warning-box {
+    background: rgba(251, 191, 36, 0.08);
+    border-left: 3px solid var(--accent-amber);
+    padding: 0.75rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin: 0.85rem 0;
+    font-size: 0.875rem;
+    color: #fef08a;
+  }
+
+  footer {
+    border-top: 1px solid var(--border-color);
+    padding: 1.25rem 1.5rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    background: #0b1120;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-block">
+    <div class="logo-icon">ОМ</div>
+    <div class="logo-text">
+      <h1>ОпірМат Лаб</h1>
+      <p>Інтерактивний посібник та інженерний симулятор</p>
+    </div>
+  </div>
+  <nav id="mainNav">
+    <button class="nav-btn active" onclick="switchTab('theory')">📚 1. Теорія з нуля</button>
+    <button class="nav-btn" onclick="switchTab('beam-sim')">🏗️ 2. Симулятор балок (Епюри)</button>
+    <button class="nav-btn" onclick="switchTab('tension-sim')">⚖️ 3. Розтяг-стиск</button>
+    <button class="nav-btn" onclick="switchTab('sections')">📐 4. Геометрія перерізів</button>
+    <button class="nav-btn" onclick="switchTab('materials')">🧪 5. Матеріали</button>
+    <button class="nav-btn" onclick="switchTab('quiz')">🎯 6. Тест для перевірки</button>
+    <button class="nav-btn" onclick="switchTab('roadmap')">🗺️ 7. Дорожня карта</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- TAB 1: ТЕОРІЯ З НУЛЯ -->
+  <section id="tab-theory" class="tab-content active">
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 0.5rem;">Фундаментальний курс опору матеріалів</h2>
+      <p style="color: var(--text-secondary); max-width: 850px;">
+        Опір матеріалів — це прикладна інженерна наука про міцність, жорсткість та стійкість елементів конструкцій під дією навантажень. На відміну від теоретичної механіки, тут усі тіла розглядаються як деформівні.
+      </p>
+    </div>
+
+    <!-- ТЕМА 1 -->
+    <div class="topic-item">
+      <div class="topic-header" onclick="toggleTopic(this)">
+        <h3><span>01</span> Вступ, базові гіпотези та розрахункові моделі</h3>
+        <span class="badge badge-blue">Основи</span>
+      </div>
+      <div class="topic-body open">
+        <p><strong>Головне завдання дисципліни:</strong> забезпечити, щоб конструкція була достатньо <em>міцною</em> (не руйнувалася), <em>жорсткою</em> (не прогиналася понад норму) та <em>стійкою</em> (не втрачала первинну рівновагу форми), залишаючись максимально економічною.</p>
+
+        <div class="tip-box">
+          <strong>Різниця з теоретичною механікою:</strong> У теоретичній механіці тіла вважаються абсолютно твердими. В опорі матеріалів ключовим є визначення внутрішніх сил, деформацій та напружень у пружному тілі.
+        </div>
+
+        <h4 style="margin: 1rem 0 0.5rem; color: var(--accent-blue);">Фундаментальні гіпотези (спрощення):</h4>
+        <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          <li><strong>Гіпотеза суцільності:</strong> Матеріал повністю заповнює об'єм деталі без пустот.</li>
+          <li><strong>Гіпотеза однорідності та ізотропності:</strong> Фізичні властивості однакові у всіх точках і в усіх напрямках (справедливо для більшості металів).</li>
+          <li><strong>Гіпотеза ідеальної пружності:</strong> Після зняття навантаження тіло повністю повертається до початкової форми (закон Гука).</li>
+          <li><strong>Гіпотеза малих деформацій:</strong> Зміни геометрії настільки малі порівняно з розмірами тіла, що розрахункову схему складають за недеформованим станом.</li>
+          <li><strong>Гіпотеза плоских перерізів (Бернуллі):</strong> Поперечні перерізи стрижня, плоскі до деформації, залишаються плоскими й перпендикулярними до осі після деформації.</li>
+          <li><strong>Принцип Сен-Венана:</strong> На відстані від місця прикладання навантаження розподіл напружень залежить тільки від загальної рівнодійної, а не від точкового способу прикладання.</li>
+          <li><strong>Принцип суперпозиції (незалежності дії сил):</strong> Сумарний ефект від кількох навантажень дорівнює алгебраїчній сумі ефектів від кожного окремо.</li>
+        </ul>
+
+        <h4 style="margin: 1rem 0 0.5rem; color: var(--accent-blue);">Типи опор та їх реакції:</h4>
+        <div class="grid-3" style="margin-top: 0.5rem;">
+          <div class="card" style="padding: 0.85rem;">
+            <div style="font-weight: 600; color: var(--accent-emerald);">Шарнірно-рухома опора</div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Забороняє лише переміщення перпендикулярно опорній площині. Виникає <strong>1 реакція</strong> (R).</p>
+          </div>
+          <div class="card" style="padding: 0.85rem;">
+            <div style="font-weight: 600; color: var(--accent-amber);">Шарнірно-нерухома опора</div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Забороняє лінійні переміщення у площині, дозволяє поворот. Виникають <strong>2 реакції</strong> (Rx, Ry).</p>
+          </div>
+          <div class="card" style="padding: 0.85rem;">
+            <div style="font-weight: 600; color: var(--accent-rose);">Жорстке затиснення (закладення)</div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Забороняє будь-які переміщення і поворот. Виникають <strong>3 реакції</strong> (Rx, Ry та реактивний момент Mr).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ТЕМА 2 -->
+    <div class="topic-item">
+      <div class="topic-header" onclick="toggleTopic(this)">
+        <h3><span>02</span> Метод перерізів (РОРО) та внутрішні зусилля</h3>
+        <span class="badge badge-indigo">Головний метод</span>
+      </div>
+      <div class="topic-body">
+        <p>Зовнішні сили намагаються деформувати тіло, а сили міжатомної взаємодії протидіють цьому. Щоб знайти внутрішні зусилля у будь-якому перерізі, застосовують <strong>метод перерізів</strong>.</p>
+        
+        <div class="tip-box">
+          <strong>Мнемонічне правило РОРО:</strong><br>
+          1. <strong>Р</strong>озрізати — подумки розсікаємо стрижень у потрібному місці.<br>
+          2. <strong>О</strong>дкинути — відкидаємо ту частину, де більше навантажень.<br>
+          3. <strong>Р</strong>івновага — дію відкинутої частини замінюємо внутрішніми силовими факторами.<br>
+          4. <strong>О</strong>бчислити — записуємо рівняння рівноваги статики (&Sigma;Fx = 0, &Sigma;Fy = 0, &Sigma;M = 0) для залишеної частини.
+        </div>
+
+        <p style="margin-top: 0.75rem;">У загальному просторовому випадку в перерізі виникають 6 внутрішніх зусиль:</p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+          <li><strong>N</strong> — поздовжня сила (викликає розтяг або стиск уздовж осі x).</li>
+          <li><strong>Qy, Qz</strong> — поперечні сили (викликають зсув).</li>
+          <li><strong>T (або Mk)</strong> — крутний момент (викликає кручення).</li>
+          <li><strong>My, Mz</strong> — згинальні моменти (викликають згин відносно осей y та z).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ТЕМА 3 -->
+    <div class="topic-item">
+      <div class="topic-header" onclick="toggleTopic(this)">
+        <h3><span>03</span> Одноосьовий розтяг і стиск. Напруження та закон Гука</h3>
+        <span class="badge badge-emerald">Розтяг-стиск</span>
+      </div>
+      <div class="topic-body">
+        <p>Найпростіший вид деформації, коли в перерізі діє виключно поздовжня нормальна сила N.</p>
+        
+        <div class="formula-box">
+          <span class="formula-highlight">Нормальне напруження: &sigma; = N / A</span>
+          <span class="comment">де N — поздовжня сила [Н], A — площа поперечного перерізу [м² чи мм²], &sigma; — напруження [Па або МПа = Н/мм²].</span>
+        </div>
+
+        <div class="formula-box">
+          <span class="formula-highlight">Закон Гука (в напруженнях): &sigma; = E &times; &epsilon;</span>
+          <span class="comment">де E — модуль поздовжньої пружності (модуль Юнга) [Па або ГПа], &epsilon; = &Delta;L / L — відносна деформація (безрозмірна величина).</span>
+        </div>
+
+        <div class="formula-box">
+          <span class="formula-highlight">Абсолютне видовження: &Delta;L = (N &times; L) / (E &times; A)</span>
+          <span class="comment">Добуток E&times;A називають жорсткістю стрижня при розтязі-стиску.</span>
+        </div>
+
+        <div class="formula-box">
+          <span class="formula-highlight">Умова міцності: &sigma;_max = |N_max| / A &le; [&sigma;]</span>
+          <span class="comment">де [&sigma;] = &sigma;_y / n — допустиме напруження, n — нормативний коефіцієнт запасу міцності (зазвичай 1.4 &ndash; 2.5).</span>
+        </div>
+
+        <div class="diagram-box">
+          <p style="font-weight: 600; color: var(--accent-amber); margin-bottom: 0.5rem;">Діаграма деформування пластичної сталі</p>
+          <svg viewBox="0 0 600 220" style="max-height: 200px;">
+            <line x1="50" y1="190" x2="560" y2="190" stroke="#64748b" stroke-width="2" />
+            <line x1="50" y1="190" x2="50" y2="20" stroke="#64748b" stroke-width="2" />
+            <text x="540" y="208" fill="#94a3b8" font-size="12">&epsilon; (деформація)</text>
+            <text x="25" y="25" fill="#94a3b8" font-size="12">&sigma; [МПа]</text>
+            <path d="M 50 190 L 140 80 Q 155 78 170 85 T 195 85 Q 260 40 370 35 Q 460 30 500 75" fill="none" stroke="#38bdf8" stroke-width="3" />
+            <circle cx="140" cy="80" r="4" fill="#fbbf24" />
+            <text x="100" y="70" fill="#fbbf24" font-size="11">&sigma;_пц (пропорційність)</text>
+            <circle cx="180" cy="85" r="4" fill="#34d399" />
+            <text x="175" y="105" fill="#34d399" font-size="11">&sigma;_т (текучість)</text>
+            <circle cx="370" cy="35" r="4" fill="#f43f5e" />
+            <text x="350" y="20" fill="#f43f5e" font-size="11">&sigma;_в (міцність)</text>
+            <circle cx="500" cy="75" r="4" fill="#e2e8f0" />
+            <text x="505" y="75" fill="#e2e8f0" font-size="11">Розрив</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ТЕМА 4 -->
+    <div class="topic-item">
+      <div class="topic-header" onclick="toggleTopic(this)">
+        <h3><span>04</span> Прямий плоский згин та побудова епюр Q і M</h3>
+        <span class="badge badge-amber">Ключова тема</span>
+      </div>
+      <div class="topic-body">
+        <p>Прямий згин виникає, коли сили діють у головній площині інерції балки. У поперечних перерізах виникають поперечна сила Q та згинальний момент M.</p>
+
+        <h4 style="margin: 1rem 0 0.5rem; color: var(--accent-blue);">Диференціальні залежності Журавського:</h4>
+        <div class="formula-box">
+          <span class="formula-highlight">dM / dx = Q(x)</span>
+          <span class="formula-highlight">dQ / dx = -q(x) &rArr; d²M / dx² = -q(x)</span>
+          <span class="comment">Похідна від моменту по довжині осі балки дорівнює поперечній силі. Якщо Q(x) = 0, згинальний момент M(x) має екстремум (максимум чи мінімум)!</span>
+        </div>
+
+        <h4 style="margin: 1rem 0 0.5rem; color: var(--accent-blue);">Золоті правила перевірки епюр:</h4>
+        <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <li>Під зосередженою силою F — на епюрі Q виникає <strong>стрибок</strong> на величину цієї сили (за її напрямком), а на епюрі M — <strong>злам</strong>.</li>
+          <li>Під зосередженим моментом m — на епюрі Q змін немає, а на епюрі M виникає <strong>стрибок</strong> на величину m.</li>
+          <li>На ділянці з рівномірним навантаженням q — епюра Q є <strong>похилою прямою</strong>, а епюра M — <strong>квадратною параболою</strong>, опуклістю назустріч стрілкам q.</li>
+          <li>Епюра M традиційно будується на розтягнутих волокнах. Якщо балка прогинається вниз ("посміхається"), нижні волокна розтягуються.</li>
+        </ul>
+
+        <div class="formula-box" style="margin-top: 1rem;">
+          <span class="formula-highlight">Нормальні напруження при згині (формула Нав'є): &sigma; = (M &times; y) / I_x</span>
+          <span class="formula-highlight">Максимальне напруження: &sigma;_max = |M_max| / W_x &le; [&sigma;]</span>
+          <span class="comment">де W_x = I_x / y_max — осьовий момент опору перерізу [см³ або м³].</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ТЕМА 5 -->
+    <div class="topic-item">
+      <div class="topic-header" onclick="toggleTopic(this)">
+        <h3><span>05</span> Стійкість стиснутих стрижнів (Формула Ейлера)</h3>
+        <span class="badge badge-rose">Стійкість</span>
+      </div>
+      <div class="topic-body">
+        <p>Якщо довгий тонкий стрижень навантажений стискальною силою, він втрачає стійкість задовго до досягнення границі текучості матеріалу шляхом раптового бокового викривлення (поздовжній згин).</p>
+
+        <div class="formula-box">
+          <span class="formula-highlight">Критична сила Ейлера: P_кр = (&pi;² &times; E &times; I_min) / (&mu; &times; L)²</span>
+          <span class="comment">де I_min — найменший момент інерції перерізу, L — довжина стрижня, &mu; — коефіцієнт зведення довжини:</span>
+        </div>
+
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+          <li>Обидва кінці шарнірні: <strong>&mu; = 1.0</strong></li>
+          <li>Консоль (один кінець затиснений, другий вільний): <strong>&mu; = 2.0</strong></li>
+          <li>Один кінець затиснений, другий шарнірний: <strong>&mu; &asymp; 0.7</strong></li>
+          <li>Обидва кінці жорстко затиснені: <strong>&mu; = 0.5</strong></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: СИМУЛЯТОР БАЛОК -->
+  <section id="tab-beam-sim" class="tab-content">
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 0.5rem;">Інтерактивний симулятор балок та епюр</h2>
+      <p style="color: var(--text-secondary); max-width: 850px;">
+        Змінюйте параметри балки в реальному часі та спостерігайте, як миттєво перераховуються опорні реакції й будуються точні епюри поперечних сил Q(x) та згинальних моментів M(x).
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <!-- Панель керування -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Параметри розрахункової схеми</h3>
+          <span class="badge badge-blue">Конфігуратор</span>
+        </div>
+
+        <div class="control-group">
+          <label>Тип схеми та навантаження</label>
+          <select id="beamType" onchange="updateBeamSim()">
+            <option value="simply_supported_point">Шарнірна балка + Зосереджена сила F</option>
+            <option value="simply_supported_udl">Шарнірна балка + Розподілене навантаження q</option>
+            <option value="cantilever_point">Консоль (затиснення зліва) + Сила F на кінці</option>
+            <option value="cantilever_udl">Консоль (затиснення зліва) + Навантаження q</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Довжина балки L [м]: <span class="val" id="valL">6.0 м</span></label>
+          <input type="range" id="inputL" min="2" max="12" step="0.5" value="6" oninput="updateBeamSim()">
+        </div>
+
+        <div class="control-group" id="groupLoad">
+          <label id="lblLoad">Сила F [кН]: <span class="val" id="valLoad">12.0 кН</span></label>
+          <input type="range" id="inputLoad" min="1" max="50" step="1" value="12" oninput="updateBeamSim()">
+        </div>
+
+        <div class="control-group" id="groupPos">
+          <label>Положення сили a [м]: <span class="val" id="valPos">2.0 м</span></label>
+          <input type="range" id="inputPos" min="0.5" max="5.5" step="0.5" value="2" oninput="updateBeamSim()">
+        </div>
+
+        <div class="result-banner">
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent-emerald); margin-bottom: 0.5rem;">
+            Обчислені реакції та екстремуми:
+          </div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="label">Реакція R_A</div>
+              <div class="value" id="resRA">8.00 кН</div>
+            </div>
+            <div class="result-item">
+              <div class="label">Реакція R_B</div>
+              <div class="value" id="resRB">4.00 кН</div>
+            </div>
+            <div class="result-item">
+              <div class="label">|Q_max|</div>
+              <div class="value" id="resQmax">8.00 кН</div>
+            </div>
+            <div class="result-item">
+              <div class="label">|M_max|</div>
+              <div class="value" id="resMmax">16.00 кН·м</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-box" id="beamAnalysisText" style="margin-top: 1rem;">
+          Аналіз схеми...
+        </div>
+      </div>
+
+      <!-- Графічні епюри SVG -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Розрахункова схема та Епюри</h3>
+          <span class="badge badge-emerald">SVG Візуалізація</span>
+        </div>
+
+        <div class="plot-container">
+          <div style="font-size: 0.75rem; color: var(--accent-blue); font-weight: 600; margin-bottom: 2px;">1. РОЗРАХУНКОВА СХЕМА БАЛКИ</div>
+          <svg id="svgScheme" viewBox="0 0 500 110" height="110"></svg>
+        </div>
+
+        <div class="plot-container">
+          <div style="font-size: 0.75rem; color: var(--accent-indigo); font-weight: 600; margin-bottom: 2px;">2. ЕПЮРА ПОПЕРЕЧНИХ СИЛ Q(x) [кН]</div>
+          <svg id="svgQ" viewBox="0 0 500 110" height="110"></svg>
+        </div>
+
+        <div class="plot-container">
+          <div style="font-size: 0.75rem; color: var(--accent-amber); font-weight: 600; margin-bottom: 2px;">3. ЕПЮРА ЗГИНАЛЬНИХ МОМЕНТІВ M(x) [кН·м]</div>
+          <svg id="svgM" viewBox="0 0 500 120" height="120"></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: РОЗТЯГ-СТИСК -->
+  <section id="tab-tension-sim" class="tab-content">
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 0.5rem;">Калькулятор розтягу/стиску стрижня</h2>
+      <p style="color: var(--text-secondary); max-width: 850px;">
+        Оцініть напруження &sigma;, абсолютне видовження &Delta;L та коефіцієнт запасу міцності n для вибраного конструкційного матеріалу.
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <h3>Вхідні параметри стрижня</h3>
+          <span class="badge badge-emerald">Стрижень</span>
+        </div>
+
+        <div class="control-group">
+          <label>Матеріал стрижня</label>
+          <select id="tensMat" onchange="updateTensionSim()">
+            <option value="steel3" selected>Сталь вуглецева Ст3 (σ_т = 240 МПа, E = 206 ГПа)</option>
+            <option value="steel45">Сталь 45 якісна (σ_т = 360 МПа, E = 210 ГПа)</option>
+            <option value="alum">Алюмінієвий сплав Д16Т (σ_т = 280 МПа, E = 72 ГПа)</option>
+            <option value="titan">Титан ВТ6 (σ_т = 850 МПа, E = 115 ГПа)</option>
+            <option value="wood">Сосна (вздовж волокон, σ_в = 12 МПа, E = 10 ГПа)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Поздовжня сила N [кН]: <span class="val" id="valTensN">+50 кН</span></label>
+          <input type="range" id="inputTensN" min="-150" max="250" step="5" value="50" oninput="updateTensionSim()">
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">(+) — розтяг, (−) — стиск.</div>
+        </div>
+
+        <div class="control-group">
+          <label>Довжина стрижня L [м]: <span class="val" id="valTensL">2.0 м</span></label>
+          <input type="range" id="inputTensL" min="0.5" max="10" step="0.5" value="2" oninput="updateTensionSim()">
+        </div>
+
+        <div class="control-group">
+          <label>Форма поперечного перерізу</label>
+          <select id="tensShape" onchange="renderTensionShapeInputs(); updateTensionSim();">
+            <option value="round" selected>Круглий суцільний (Діаметр d)</option>
+            <option value="rect">Прямокутний (b × h)</option>
+            <option value="pipe">Труба тонкостінна (D, товщина t)</option>
+          </select>
+        </div>
+
+        <div id="shapeInputs"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Результати розрахунку та оцінка міцності</h3>
+          <span class="badge badge-blue">Аналіз</span>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="label">Площа перерізу A</div>
+              <div class="value" id="resTensA">-- см²</div>
+            </div>
+            <div class="result-item">
+              <div class="label">Діюче напруження σ</div>
+              <div class="value" id="resTensSigma">-- МПа</div>
+            </div>
+            <div class="result-item">
+              <div class="label">Видовження ΔL</div>
+              <div class="value" id="resTensDelta">-- мм</div>
+            </div>
+            <div class="result-item">
+              <div class="label">Запас міцності n</div>
+              <div class="value" id="resTensSafety">--</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Статус міцності стрижня:</h4>
+          <div id="safetyBadgeBox" style="padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); background: #0b1120;">
+            <div id="safetyStatusText" style="font-weight: 700; font-size: 1.1rem;">--</div>
+            <div id="safetyDetailText" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">--</div>
+          </div>
+        </div>
+
+        <div class="diagram-box" style="margin-top: 1rem;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Візуалізація деформації стрижня</div>
+          <svg id="svgTensionBar" viewBox="0 0 400 100" height="90"></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: ГЕОМЕТРІЯ ПЕРЕРІЗІВ -->
+  <section id="tab-sections" class="tab-content">
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 0.5rem;">Геометричні характеристики плоских перерізів</h2>
+      <p style="color: var(--text-secondary); max-width: 850px;">
+        Опір згину і крученню визначається розподілом матеріалу відносно головних осей перерізу.
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <!-- Калькулятор -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Інженерний калькулятор перерізу</h3>
+          <span class="badge badge-indigo">Обчислення</span>
+        </div>
+
+        <div class="control-group">
+          <label>Оберіть тип перерізу</label>
+          <select id="calcSecType" onchange="renderSecCalc()">
+            <option value="rect">Прямокутник (ширина b, висота h)</option>
+            <option value="circle">Круг (діаметр d)</option>
+            <option value="pipe">Кільце / Труба (зовнішній D, внутрішній d)</option>
+            <option value="i-beam">Двотавр симетричний (h, b)</option>
+          </select>
+        </div>
+
+        <div id="secInputs"></div>
+
+        <div class="result-banner">
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="label">Площа A</div>
+              <div class="value" id="calcResA">-- см²</div>
+            </div>
+            <div class="result-item">
+              <div class="label">Момент інерції I_x</div>
+              <div class="value" id="calcResIx">-- см⁴</div>
+            </div>
+            <div class="result-item">
+              <div class="label">Момент опору W_x</div>
+              <div class="value" id="calcResWx">-- см³</div>
+            </div>
+            <div class="result-item">
+              <div class="label">Радіус інерції i_x</div>
+              <div class="value" id="calcResIxRad">-- см</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Таблиця формул -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Канонічні формули геометрії</h3>
+          <span class="badge badge-amber">Шпаргалка</span>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Переріз</th>
+                <th>Площа A</th>
+                <th>Момент інерції I_x</th>
+                <th>Момент опору W_x</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Прямокутник</strong> (b &times; h)</td>
+                <td>b &times; h</td>
+                <td>(b &times; h³) / 12</td>
+                <td>(b &times; h²) / 6</td>
+              </tr>
+              <tr>
+                <td><strong>Круг</strong> (діаметр d)</td>
+                <td>&pi; d² / 4</td>
+                <td>&pi; d⁴ / 64 &asymp; 0.05 d⁴</td>
+                <td>&pi; d³ / 32 &asymp; 0.1 d³</td>
+              </tr>
+              <tr>
+                <td><strong>Труба</strong> (D, d, &alpha;=d/D)</td>
+                <td>&pi; (D² - d²) / 4</td>
+                <td>(&pi; D⁴ / 64) &times; (1 - &alpha;⁴)</td>
+                <td>(&pi; D³ / 32) &times; (1 - &alpha;⁴)</td>
+              </tr>
+              <tr>
+                <td><strong>Круг при крученні</strong> (Ip, Wp)</td>
+                <td>&pi; d² / 4</td>
+                <td>Ip = &pi; d⁴ / 32</td>
+                <td>Wp = &pi; d³ / 16</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tip-box">
+          <strong>Теорема Штейнера (паралельне перенесення осей):</strong><br>
+          Ix = Ix₀ + a² &times; A, де Ix₀ — момент інерції відносно власної центральної осі, a — відстань між осями, A — площа фігури.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 5: МАТЕРІАЛИ -->
+  <section id="tab-materials" class="tab-content">
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 0.5rem;">Довідник конструкційних матеріалів</h2>
+      <p style="color: var(--text-secondary); max-width: 850px;">
+        Фізико-механічні характеристики основних конструкційних матеріалів, необхідні для інженерних розрахунків.
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
+        <input type="text" id="matSearch" placeholder="🔍 Пошук за назвою матеріалу чи групою..." oninput="filterMaterialsTable()" style="max-width: 350px;">
+      </div>
+
+      <div class="table-responsive">
+        <table id="matTable">
+          <thead>
+            <tr>
+              <th>Матеріал</th>
+              <th>Тип</th>
+              <th>Модуль Юнга E [ГПа]</th>
+              <th>Модуль зсуву G [ГПа]</th>
+              <th>Коеф. Пуассона &mu;</th>
+              <th>Границя текучості &sigma;_т [МПа]</th>
+              <th>Границя міцності &sigma;_в [МПа]</th>
+              <th>Допустиме [&sigma;] [МПа]</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Сталь Ст3сп</strong></td>
+              <td>Вуглецева звичайна якість</td>
+              <td>206</td>
+              <td>79</td>
+              <td>0.28</td>
+              <td>240</td>
+              <td>370 &ndash; 460</td>
+              <td>160</td>
+            </tr>
+            <tr>
+              <td><strong>Сталь 20</strong></td>
+              <td>Вуглецева якісна</td>
+              <td>208</td>
+              <td>80</td>
+              <td>0.28</td>
+              <td>250</td>
+              <td>410</td>
+              <td>165</td>
+            </tr>
+            <tr>
+              <td><strong>Сталь 45</strong></td>
+              <td>Середньовуглецева якісна</td>
+              <td>210</td>
+              <td>81</td>
+              <td>0.29</td>
+              <td>360</td>
+              <td>600</td>
+              <td>200</td>
+            </tr>
+            <tr>
+              <td><strong>Сталь 40Х</strong></td>
+              <td>Легована конструкційна</td>
+              <td>214</td>
+              <td>82</td>
+              <td>0.30</td>
+              <td>780 (термооброблена)</td>
+              <td>980</td>
+              <td>350</td>
+            </tr>
+            <tr>
+              <td><strong>Чавун СЧ20</strong></td>
+              <td>Сірий чавун (крихкий)</td>
+              <td>115</td>
+              <td>45</td>
+              <td>0.25</td>
+              <td>— (крихкий)</td>
+              <td>200 (розтяг) / 800 (стиск)</td>
+              <td>60 (розтяг) / 240 (стиск)</td>
+            </tr>
+            <tr>
+              <td><strong>Д16Т (Дюралюміній)</strong></td>
+              <td>Алюмінієвий сплав</td>
+              <td>72</td>
+              <td>27</td>
+              <td>0.31</td>
+              <td>280</td>
+              <td>420</td>
+              <td>180</td>
+            </tr>
+            <tr>
+              <td><strong>Титан ВТ6</strong></td>
+              <td>Титановий високоміцний сплав</td>
+              <td>115</td>
+              <td>43</td>
+              <td>0.33</td>
+              <td>850</td>
+              <td>950</td>
+              <td>450</td>
+            </tr>
+            <tr>
+              <td><strong>Латунь Л63</strong></td>
+              <td>Мідний сплав</td>
+              <td>105</td>
+              <td>39</td>
+              <td>0.34</td>
+              <td>140</td>
+              <td>350</td>
+              <td>110</td>
+            </tr>
+            <tr>
+              <td><strong>Сосна (вздовж волокон)</strong></td>
+              <td>Деревина природна</td>
+              <td>10</td>
+              <td>0.6</td>
+              <td>0.45</td>
+              <td>—</td>
+              <td>80 (розтяг) / 40 (стиск)</td>
+              <td>12</td>
+            </tr>
+            <tr>
+              <td><strong>Бетон В25</strong></td>
+              <td>Будівельний композит</td>
+              <td>30</td>
+              <td>12</td>
+              <td>0.20</td>
+              <td>—</td>
+              <td>1.8 (розтяг) / 18.5 (стиск)</td>
+              <td>1.0 (розтяг) / 14.5 (стиск)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 6: ТЕСТ ДЛЯ ПЕРЕВІРКИ -->
+  <section id="tab-quiz" class="tab-content">
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 0.5rem;">Інтерактивний тест для самоперевірки</h2>
+      <p style="color: var(--text-secondary); max-width: 850px;">
+        Перевірте, наскільки добре ви засвоїли базові поняття та інтуїцію опору матеріалів. Оберіть відповідь і отримайте детальне інженерне роз'яснення.
+      </p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;" id="quizContainer"></div>
+  </section>
+
+  <!-- TAB 7: ДОРОЖНЯ КАРТА -->
+  <section id="tab-roadmap" class="tab-content">
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 0.5rem;">Дорожня карта вивчення та інженерний алгоритм</h2>
+      <p style="color: var(--text-secondary); max-width: 850px;">
+        Чіткий алгоритм дій, який дозволить вирішити переважну більшість розрахункових завдань на згин та міцність.
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <h3>5-кроковий алгоритм розрахунку балки на згин</h3>
+          <span class="badge badge-emerald">Покроковий гід</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="display: flex; gap: 0.75rem;">
+            <div style="min-width: 28px; height: 28px; border-radius: 50%; background: var(--accent-blue); color: #0f172a; font-weight: 700; display: flex; align-items: center; justify-content: center;">1</div>
+            <div>
+              <strong style="color: var(--text-primary);">Розрахункова схема та визначення опорних реакцій:</strong>
+              <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                Зобразіть балку з навантаженнями. Замініть опори реакціями. Складіть рівняння рівноваги (&Sigma;MA = 0, &Sigma;MB = 0, &Sigma;Fy = 0) та обов'язково виконайте перевірку рівноваги.
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <div style="min-width: 28px; height: 28px; border-radius: 50%; background: var(--accent-blue); color: #0f172a; font-weight: 700; display: flex; align-items: center; justify-content: center;">2</div>
+            <div>
+              <strong style="color: var(--text-primary);">Розбиття на характерні ділянки:</strong>
+              <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                Межі ділянок визначаються точками прикладання зосереджених сил, моментів, опор та межами розподіленого навантаження q.
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <div style="min-width: 28px; height: 28px; border-radius: 50%; background: var(--accent-blue); color: #0f172a; font-weight: 700; display: flex; align-items: center; justify-content: center;">3</div>
+            <div>
+              <strong style="color: var(--text-primary);">Складання рівнянь Q(x) та M(x) методом перерізів:</strong>
+              <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                Для кожної ділянки методом перерізів складіть рівняння Q(x) та M(x). Знайдіть координату, де Q(x) = 0, та обчисліть там локальний екстремум моменту M.
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <div style="min-width: 28px; height: 28px; border-radius: 50%; background: var(--accent-blue); color: #0f172a; font-weight: 700; display: flex; align-items: center; justify-content: center;">4</div>
+            <div>
+              <strong style="color: var(--text-primary);">Побудова епюр та самоперевірка:</strong>
+              <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                Накресліть епюри під балкою. Перевірте стрибки на епюрі Q під зосередженими силами, кутові злами на епюрі M та параболи під q.
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <div style="min-width: 28px; height: 28px; border-radius: 50%; background: var(--accent-blue); color: #0f172a; font-weight: 700; display: flex; align-items: center; justify-content: center;">5</div>
+            <div>
+              <strong style="color: var(--text-primary);">Розрахунок на міцність і підбір перерізу:</strong>
+              <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                Знайдіть небезпечний переріз із |M_max|. Визначте необхідний момент опору W_req = |M_max| / [&sigma;]. За сортаментом підберіть відповідний профіль.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Контроль розмірностей та типові пастки</h3>
+          <span class="badge badge-amber">Увага</span>
+        </div>
+
+        <h4 style="font-size: 0.95rem; color: var(--accent-blue); margin-bottom: 0.5rem;">Узгодження одиниць у формулі напружень:</h4>
+        <div class="formula-box">
+          <span class="formula-highlight">1 МПа = 1 Н/мм² = 10⁶ Па = 10⁶ Н/м²</span>
+          <span class="comment">Найзручніше для інженерних розрахунків підставляти всі сили в Ньютони [Н], а розміри — в міліметри [мм]. Тоді напруження автоматично виходять у МПа!</span>
+        </div>
+
+        <h4 style="font-size: 0.95rem; color: var(--accent-rose); margin-top: 1rem; margin-bottom: 0.5rem;">Топ-4 типові помилки початківців:</h4>
+        <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+          <li><strong>Плутанина між сантиметрами та міліметрами:</strong> У сортаменті моменти інерції I_x подано в см⁴, а моменти опору W_x — в см³. При переводі в метри чи міліметри пам'ятайте, що 1 см³ = 10³ мм³ = 10⁻⁶ м³.</li>
+          <li><strong>Невірна довжина плеча для розподіленого навантаження q:</strong> Рівнодійна q&times;x прикладена рівно посередині ділянки x, тобто плече дорівнює x/2. Тому момент розподіленого навантаження завжди містить (q&times;x²)/2.</li>
+          <li><strong>Не перевірили точку, де Q = 0:</strong> Якщо на ділянці з навантаженням q епюра Q перетинає нуль, саме там виникає максимальний згинальний момент, а не на опорі!</li>
+          <li><strong>Знаки поздовжньої сили:</strong> Розтяг завжди позначається знаком (+), стиск — знаком (−).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p><strong>ОпірМат Лаб</strong> • Інтерактивний посібник та інженерний симулятор для швидкого старту у вивченні опору матеріалів</p>
+  <p style="margin-top: 0.25rem;">Всі розрахунки та візуалізації виконуються автономно у вашому браузері.</p>
+</footer>
+
+<script>
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  
+  const target = document.getElementById('tab-' + tabId);
+  if (target) target.classList.add('active');
+  
+  const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+  if (btn) btn.classList.add('active');
+
+  if (tabId === 'beam-sim') updateBeamSim();
+  if (tabId === 'tension-sim') updateTensionSim();
+  if (tabId === 'sections') renderSecCalc();
+}
+
+function toggleTopic(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+/* СИМУЛЯТОР БАЛОК */
+function updateBeamSim() {
+  const type = document.getElementById('beamType').value;
+  const L = parseFloat(document.getElementById('inputL').value);
+  const load = parseFloat(document.getElementById('inputLoad').value);
+  const posInput = document.getElementById('inputPos');
+  
+  posInput.max = (L - 0.5).toString();
+  if (parseFloat(posInput.value) > L - 0.5) posInput.value = (L - 0.5).toString();
+  const a = parseFloat(posInput.value);
+
+  document.getElementById('valL').innerText = L.toFixed(1) + ' м';
+  document.getElementById('valPos').innerText = a.toFixed(1) + ' м';
+
+  const groupPos = document.getElementById('groupPos');
+  const lblLoad = document.getElementById('lblLoad');
+
+  let RA = 0, RB = 0, Qmax = 0, Mmax = 0;
+  let qPoints = [];
+  let mPoints = [];
+  let analysisText = "";
+
+  if (type === 'simply_supported_point') {
+    groupPos.style.display = 'block';
+    lblLoad.innerHTML = 'Сила F [кН]: <span class="val" id="valLoad">' + load.toFixed(1) + ' кН</span>';
+    
+    RA = load * (L - a) / L;
+    RB = load * a / L;
+    Qmax = Math.max(RA, RB);
+    Mmax = RA * a;
+
+    analysisText = `<strong>Аналіз:</strong> Двоопорна балка під дією сили F = ${load} кН на відстані a = ${a} м від лівої опори. Ліва реакція RA = ${RA.toFixed(2)} кН, права реакція RB = ${RB.toFixed(2)} кН. Під силою на епюрі Q виникає стрибок рівно на F = ${load} кН, а на епюрі M — злам із максимумом M_max = ${Mmax.toFixed(2)} кН·м.`;
+
+    qPoints = [
+      {x: 0, q: RA},
+      {x: a, q: RA},
+      {x: a, q: -RB},
+      {x: L, q: -RB}
+    ];
+
+    mPoints = [
+      {x: 0, m: 0},
+      {x: a, m: Mmax},
+      {x: L, m: 0}
+    ];
+
+  } else if (type === 'simply_supported_udl') {
+    groupPos.style.display = 'none';
+    lblLoad.innerHTML = 'Навантаження q [кН/м]: <span class="val" id="valLoad">' + load.toFixed(1) + ' кН/м</span>';
+
+    RA = (load * L) / 2;
+    RB = RA;
+    Qmax = RA;
+    Mmax = (load * L * L) / 8;
+
+    analysisText = `<strong>Аналіз:</strong> Симетрична двоопорна балка під розподіленим навантаженням q = ${load} кН/м. Опорні реакції рівні: RA = RB = ${RA.toFixed(2)} кН. Епюра Q(x) є похилою прямою, що перетинає нуль точно посередині (x = ${(L/2).toFixed(1)} м). У цій точці згинальний момент сягає максимуму M_max = qL²/8 = ${Mmax.toFixed(2)} кН·м за квадратною параболою.`;
+
+    qPoints = [
+      {x: 0, q: RA},
+      {x: L, q: -RB}
+    ];
+
+    mPoints = [];
+    const steps = 30;
+    for (let i = 0; i <= steps; i++) {
+      let x = (L / steps) * i;
+      let m = (load * x / 2) * (L - x);
+      mPoints.push({x: x, m: m});
+    }
+
+  } else if (type === 'cantilever_point') {
+    groupPos.style.display = 'none';
+    lblLoad.innerHTML = 'Сила F [кН]: <span class="val" id="valLoad">' + load.toFixed(1) + ' кН</span>';
+
+    RA = load;
+    RB = 0;
+    Qmax = load;
+    Mmax = load * L;
+
+    analysisText = `<strong>Аналіз:</strong> Консольна балка з жорстким затисненням зліва. Реактивна сила в затисненні RA = ${RA.toFixed(2)} кН, реактивний момент Mr = ${Mmax.toFixed(2)} кН·м. Поперечна сила стала на всій довжині, а момент лінійно зростає від 0 на правому кінці до максимуму в затисненні. Розтягнуті верхні волокна!`;
+
+    qPoints = [
+      {x: 0, q: load},
+      {x: L, q: load}
+    ];
+
+    mPoints = [
+      {x: 0, m: Mmax},
+      {x: L, m: 0}
+    ];
+
+  } else if (type === 'cantilever_udl') {
+    groupPos.style.display = 'none';
+    lblLoad.innerHTML = 'Навантаження q [кН/м]: <span class="val" id="valLoad">' + load.toFixed(1) + ' кН/м</span>';
+
+    RA = load * L;
+    RB = 0;
+    Qmax = RA;
+    Mmax = (load * L * L) / 2;
+
+    analysisText = `<strong>Аналіз:</strong> Консольна балка під навантаженням q = ${load} кН/м. Реакція RA = qL = ${RA.toFixed(2)} кН, момент у затисненні Mr = qL²/2 = ${Mmax.toFixed(2)} кН·м. Епюра Q змінюється лінійно від RA до 0, а епюра M є параболою з вершиною на правому кінці.`;
+
+    qPoints = [
+      {x: 0, q: RA},
+      {x: L, q: 0}
+    ];
+
+    mPoints = [];
+    const steps = 30;
+    for (let i = 0; i <= steps; i++) {
+      let x = (L / steps) * i;
+      let m = (load / 2) * Math.pow(L - x, 2);
+      mPoints.push({x: x, m: m});
+    }
+  }
+
+  document.getElementById('resRA').innerText = RA.toFixed(2) + ' кН';
+  document.getElementById('resRB').innerText = type.startsWith('cantilever') ? '—' : RB.toFixed(2) + ' кН';
+  document.getElementById('resQmax').innerText = Qmax.toFixed(2) + ' кН';
+  document.getElementById('resMmax').innerText = Mmax.toFixed(2) + ' кН·м';
+  document.getElementById('beamAnalysisText').innerHTML = analysisText;
+
+  drawScheme(type, L, load, a, RA, RB);
+  drawDiagramQ(L, qPoints, Qmax);
+  drawDiagramM(L, mPoints, Mmax);
+}
+
+function drawScheme(type, L, load, a, RA, RB) {
+  const svg = document.getElementById('svgScheme');
+  const xStart = 50, xEnd = 450;
+  const yBeam = 60;
+  const beamLengthPx = xEnd - xStart;
+
+  function toPx(x) { return xStart + (x / L) * beamLengthPx; }
+
+  let svgHtml = `<rect x="${xStart}" y="${yBeam - 4}" width="${beamLengthPx}" height="8" rx="2" fill="#38bdf8" />`;
+
+  if (type.startsWith('cantilever')) {
+    svgHtml += `
+      <line x1="${xStart}" y1="${yBeam - 25}" x2="${xStart}" y2="${yBeam + 25}" stroke="#94a3b8" stroke-width="4" />
+      <g stroke="#64748b" stroke-width="2">
+        <line x1="${xStart}" y1="${yBeam - 20}" x2="${xStart - 10}" y2="${yBeam - 10}" />
+        <line x1="${xStart}" y1="${yBeam - 10}" x2="${xStart - 10}" y2="${yBeam}" />
+        <line x1="${xStart}" y1="${yBeam}" x2="${xStart - 10}" y2="${yBeam + 10}" />
+        <line x1="${xStart}" y1="${yBeam + 10}" x2="${xStart - 10}" y2="${yBeam + 20}" />
+      </g>
+      <text x="${xStart + 8}" y="${yBeam + 25}" fill="#34d399" font-size="11" font-weight="600">RA = ${RA.toFixed(1)} кН</text>
+    `;
+  } else {
+    const xA = xStart;
+    svgHtml += `
+      <polygon points="${xA},${yBeam + 4} ${xA - 10},${yBeam + 22} ${xA + 10},${yBeam + 22}" fill="#64748b" />
+      <line x1="${xA - 14}" y1="${yBeam + 23}" x2="${xA + 14}" y2="${yBeam + 23}" stroke="#94a3b8" stroke-width="2" />
+      <text x="${xA - 4}" y="${yBeam + 36}" fill="#94a3b8" font-size="11" font-weight="600">A</text>
+      <text x="${xA - 5}" y="${yBeam - 10}" fill="#34d399" font-size="10" font-weight="600">${RA.toFixed(1)}</text>
+    `;
+
+    const xB = xEnd;
+    svgHtml += `
+      <polygon points="${xB},${yBeam + 4} ${xB - 10},${yBeam + 20} ${xB + 10},${yBeam + 20}" fill="#64748b" />
+      <circle cx="${xB - 5}" cy="${yBeam + 23}" r="3" fill="#94a3b8" />
+      <circle cx="${xB + 5}" cy="${yBeam + 23}" r="3" fill="#94a3b8" />
+      <line x1="${xB - 14}" y1="${yBeam + 28}" x2="${xB + 14}" y2="${yBeam + 28}" stroke="#94a3b8" stroke-width="2" />
+      <text x="${xB - 4}" y="${yBeam + 40}" fill="#94a3b8" font-size="11" font-weight="600">B</text>
+      <text x="${xB - 15}" y="${yBeam - 10}" fill="#34d399" font-size="10" font-weight="600">${RB.toFixed(1)}</text>
+    `;
+  }
+
+  if (type === 'simply_supported_point') {
+    const xF = toPx(a);
+    svgHtml += `
+      <line x1="${xF}" y1="${yBeam - 42}" x2="${xF}" y2="${yBeam - 6}" stroke="#f43f5e" stroke-width="3" />
+      <polygon points="${xF},${yBeam - 4} ${xF - 5},${yBeam - 14} ${xF + 5},${yBeam - 14}" fill="#f43f5e" />
+      <text x="${xF - 20}" y="${yBeam - 46}" fill="#f43f5e" font-size="12" font-weight="700">F = ${load} кН</text>
+    `;
+  } else if (type === 'cantilever_point') {
+    const xF = xEnd;
+    svgHtml += `
+      <line x1="${xF}" y1="${yBeam - 42}" x2="${xF}" y2="${yBeam - 6}" stroke="#f43f5e" stroke-width="3" />
+      <polygon points="${xF},${yBeam - 4} ${xF - 5},${yBeam - 14} ${xF + 5},${yBeam - 14}" fill="#f43f5e" />
+      <text x="${xF - 45}" y="${yBeam - 46}" fill="#f43f5e" font-size="12" font-weight="700">F = ${load} кН</text>
+    `;
+  } else {
+    svgHtml += `
+      <rect x="${xStart}" y="${yBeam - 25}" width="${beamLengthPx}" height="20" fill="rgba(245, 158, 11, 0.15)" stroke="#fbbf24" stroke-dasharray="3,3" />
+      <text x="${xStart + beamLengthPx / 2 - 35}" y="${yBeam - 30}" fill="#fbbf24" font-size="11" font-weight="600">q = ${load} кН/м</text>
+    `;
+    const numArrows = 9;
+    for (let i = 0; i <= numArrows; i++) {
+      let xArr = xStart + (beamLengthPx / numArrows) * i;
+      svgHtml += `
+        <line x1="${xArr}" y1="${yBeam - 22}" x2="${xArr}" y2="${yBeam - 6}" stroke="#fbbf24" stroke-width="1.5" />
+        <polygon points="${xArr},${yBeam - 4} ${xArr - 3},${yBeam - 10} ${xArr + 3},${yBeam - 10}" fill="#fbbf24" />
+      `;
+    }
+  }
+
+  svg.innerHTML = svgHtml;
+}
+
+function drawDiagramQ(L, points, Qmax) {
+  const svg = document.getElementById('svgQ');
+  const xStart = 50, xEnd = 450;
+  const yZero = 55;
+  const beamLengthPx = xEnd - xStart;
+  const scale = Qmax > 0 ? 38 / Qmax : 1;
+
+  function toPx(x) { return xStart + (x / L) * beamLengthPx; }
+  function toPy(q) { return yZero - q * scale; }
+
+  let pathD = `M ${toPx(points[0].x)} ${yZero} `;
+  let fillD = `M ${toPx(points[0].x)} ${yZero} `;
+
+  for (let pt of points) {
+    let px = toPx(pt.x);
+    let py = toPy(pt.q);
+    pathD += `L ${px} ${py} `;
+    fillD += `L ${px} ${py} `;
+  }
+  fillD += `L ${toPx(points[points.length - 1].x)} ${yZero} Z`;
+
+  let svgHtml = `
+    <line x1="${xStart}" y1="${yZero}" x2="${xEnd}" y2="${yZero}" stroke="#475569" stroke-width="1.5" />
+    <text x="25" y="${yZero + 4}" fill="#64748b" font-size="11">0</text>
+    <path d="${fillD}" fill="rgba(129, 140, 248, 0.15)" />
+    <path d="${pathD}" fill="none" stroke="#818cf8" stroke-width="2.5" />
+  `;
+
+  for (let i = 0; i < points.length; i++) {
+    let pt = points[i];
+    let px = toPx(pt.x);
+    let py = toPy(pt.q);
+    if (Math.abs(pt.q) > 0.05) {
+      let textY = pt.q > 0 ? py - 6 : py + 14;
+      svgHtml += `<text x="${px - 8}" y="${textY}" fill="#c7d2fe" font-size="10" font-weight="600">${pt.q > 0 ? '+' : ''}${pt.q.toFixed(1)}</text>`;
+    }
+  }
+
+  svg.innerHTML = svgHtml;
+}
+
+function drawDiagramM(L, points, Mmax) {
+  const svg = document.getElementById('svgM');
+  const xStart = 50, xEnd = 450;
+  const yZero = 35;
+  const beamLengthPx = xEnd - xStart;
+  const scale = Mmax > 0 ? 65 / Mmax : 1;
+
+  function toPx(x) { return xStart + (x / L) * beamLengthPx; }
+  function toPy(m) { return yZero + m * scale; }
+
+  let pathD = `M ${toPx(points[0].x)} ${yZero} `;
+  let fillD = `M ${toPx(points[0].x)} ${yZero} `;
+
+  for (let pt of points) {
+    let px = toPx(pt.x);
+    let py = toPy(pt.m);
+    pathD += `L ${px} ${py} `;
+    fillD += `L ${px} ${py} `;
+  }
+  fillD += `L ${toPx(points[points.length - 1].x)} ${yZero} Z`;
+
+  let svgHtml = `
+    <line x1="${xStart}" y1="${yZero}" x2="${xEnd}" y2="${yZero}" stroke="#475569" stroke-width="1.5" />
+    <text x="25" y="${yZero + 4}" fill="#64748b" font-size="11">0</text>
+    <path d="${fillD}" fill="rgba(251, 191, 36, 0.15)" />
+    <path d="${pathD}" fill="none" stroke="#fbbf24" stroke-width="2.5" />
+  `;
+
+  let maxPt = points.reduce((prev, curr) => (curr.m > prev.m) ? curr : prev, points[0]);
+  if (maxPt && maxPt.m > 0.05) {
+    let mx = toPx(maxPt.x);
+    let my = toPy(maxPt.m);
+    svgHtml += `
+      <circle cx="${mx}" cy="${my}" r="4" fill="#fbbf24" />
+      <text x="${mx - 20}" y="${my + 16}" fill="#fef08a" font-size="11" font-weight="700">M_max = ${maxPt.m.toFixed(2)} кН·м</text>
+    `;
+  }
+
+  svg.innerHTML = svgHtml;
+}
+
+/* СИМУЛЯТОР РОЗТЯГУ / СТИСКУ */
+const materialsDB = {
+  steel3: { name: "Сталь Ст3", sigma_y: 240, E: 206000 },
+  steel45: { name: "Сталь 45", sigma_y: 360, E: 210000 },
+  alum: { name: "Дюралюміній Д16Т", sigma_y: 280, E: 72000 },
+  titan: { name: "Титан ВТ6", sigma_y: 850, E: 115000 },
+  wood: { name: "Сосна (уздовж)", sigma_y: 12, E: 10000 }
+};
+
+function renderTensionShapeInputs() {
+  const shape = document.getElementById('tensShape').value;
+  const container = document.getElementById('shapeInputs');
+
+  if (shape === 'round') {
+    container.innerHTML = `
+      <div class="control-group">
+        <label>Діаметр d [мм]: <span class="val" id="valDiam">30 мм</span></label>
+        <input type="range" id="inputDiam" min="5" max="150" step="1" value="30" oninput="updateTensionSim()">
+      </div>
+    `;
+  } else if (shape === 'rect') {
+    container.innerHTML = `
+      <div class="control-group">
+        <label>Ширина b [мм]: <span class="val" id="valRectB">20 мм</span></label>
+        <input type="range" id="inputRectB" min="5" max="120" step="1" value="20" oninput="updateTensionSim()">
+      </div>
+      <div class="control-group">
+        <label>Висота h [мм]: <span class="val" id="valRectH">40 мм</span></label>
+        <input type="range" id="inputRectH" min="5" max="150" step="1" value="40" oninput="updateTensionSim()">
+      </div>
+    `;
+  } else if (shape === 'pipe') {
+    container.innerHTML = `
+      <div class="control-group">
+        <label>Зовнішній діаметр D [мм]: <span class="val" id="valPipeD">50 мм</span></label>
+        <input type="range" id="inputPipeD" min="20" max="150" step="2" value="50" oninput="updateTensionSim()">
+      </div>
+      <div class="control-group">
+        <label>Товщина стінки t [мм]: <span class="val" id="valPipeT">4 мм</span></label>
+        <input type="range" id="inputPipeT" min="1" max="15" step="0.5" value="4" oninput="updateTensionSim()">
+      </div>
+    `;
+  }
+}
+
+function updateTensionSim() {
+  const shape = document.getElementById('tensShape').value;
+  if (!document.getElementById('inputDiam') && !document.getElementById('inputRectB') && !document.getElementById('inputPipeD')) {
+    renderTensionShapeInputs();
+  }
+
+  const matKey = document.getElementById('tensMat').value;
+  const mat = materialsDB[matKey];
+  const N_kN = parseFloat(document.getElementById('inputTensN').value);
+  const L_m = parseFloat(document.getElementById('inputTensL').value);
+
+  document.getElementById('valTensN').innerText = (N_kN > 0 ? '+' : '') + N_kN.toFixed(0) + ' кН';
+  document.getElementById('valTensL').innerText = L_m.toFixed(1) + ' м';
+
+  let Area_mm2 = 0;
+  if (shape === 'round') {
+    const d = parseFloat(document.getElementById('inputDiam').value);
+    document.getElementById('valDiam').innerText = d + ' мм';
+    Area_mm2 = (Math.PI * d * d) / 4;
+  } else if (shape === 'rect') {
+    const b = parseFloat(document.getElementById('inputRectB').value);
+    const h = parseFloat(document.getElementById('inputRectH').value);
+    document.getElementById('valRectB').innerText = b + ' мм';
+    document.getElementById('valRectH').innerText = h + ' мм';
+    Area_mm2 = b * h;
+  } else if (shape === 'pipe') {
+    const D = parseFloat(document.getElementById('inputPipeD').value);
+    const t = parseFloat(document.getElementById('inputPipeT').value);
+    document.getElementById('valPipeD').innerText = D + ' мм';
+    document.getElementById('valPipeT').innerText = t + ' мм';
+    const d = Math.max(2, D - 2 * t);
+    Area_mm2 = (Math.PI * (D * D - d * d)) / 4;
+  }
+
+  const N_N = N_kN * 1000;
+  const L_mm = L_m * 1000;
+
+  const sigma = N_N / Area_mm2;
+  const absSigma = Math.abs(sigma);
+  const deltaL_mm = (N_N * L_mm) / (mat.E * Area_mm2);
+  const safetyFactor = absSigma > 0.001 ? (mat.sigma_y / absSigma) : 999;
+
+  document.getElementById('resTensA').innerText = (Area_mm2 / 100).toFixed(2) + ' см²';
+  document.getElementById('resTensSigma').innerText = sigma.toFixed(1) + ' МПа';
+  document.getElementById('resTensDelta').innerText = deltaL_mm.toFixed(3) + ' мм';
+  document.getElementById('resTensSafety').innerText = safetyFactor > 50 ? '> 50' : safetyFactor.toFixed(2);
+
+  const badgeBox = document.getElementById('safetyBadgeBox');
+  const statusTxt = document.getElementById('safetyStatusText');
+  const detailTxt = document.getElementById('safetyDetailText');
+
+  if (safetyFactor >= 1.5) {
+    statusTxt.innerHTML = `<span style="color: var(--accent-emerald);">✔ УМОВА МІЦНОСТІ ВИКОНУЄТЬСЯ (n = ${safetyFactor.toFixed(2)} &ge; 1.5)</span>`;
+    detailTxt.innerText = `Конструкція працює в межах пружності. Залишкових пластичних деформацій немає. Напруження ${absSigma.toFixed(1)} МПа менше за границю текучості ${mat.sigma_y} МПа.`;
+    badgeBox.style.borderColor = 'var(--accent-emerald)';
+  } else if (safetyFactor >= 1.0) {
+    statusTxt.innerHTML = `<span style="color: var(--accent-amber);">⚠ НЕБЕЗПЕЧНА ЗОНА (Запас n = ${safetyFactor.toFixed(2)} < 1.5)</span>`;
+    detailTxt.innerText = `Запас міцності нижчий від рекомендованого будівельного чи машинобудівного нормативу.`;
+    badgeBox.style.borderColor = 'var(--accent-amber)';
+  } else {
+    statusTxt.innerHTML = `<span style="color: var(--accent-rose);">✖ АВАРІЙНИЙ СТАН: РУЙНУВАННЯ / ТЕКУЧІСТЬ (n = ${safetyFactor.toFixed(2)} < 1.0)</span>`;
+    detailTxt.innerText = `Діюче напруження (${absSigma.toFixed(1)} МПа) перевищує границю текучості (${mat.sigma_y} МПа)! Виникнуть незворотні пластичні деформації.`;
+    badgeBox.style.borderColor = 'var(--accent-rose)';
+  }
+
+  drawTensionBar(N_kN, deltaL_mm, safetyFactor);
+}
+
+function drawTensionBar(N, deltaL, safety) {
+  const svg = document.getElementById('svgTensionBar');
+  const xFixed = 50;
+  const origLen = 220;
+  const deflPx = Math.max(-35, Math.min(50, deltaL * 15));
+  const curLen = origLen + deflPx;
+  const barH = 26;
+  const yBar = 32;
+
+  let barColor = safety >= 1.5 ? '#34d399' : (safety >= 1.0 ? '#fbbf24' : '#f43f5e');
+
+  let svgHtml = `
+    <line x1="${xFixed}" y1="10" x2="${xFixed}" y2="80" stroke="#94a3b8" stroke-width="4" />
+    <g stroke="#64748b" stroke-width="1.5">
+      <line x1="${xFixed}" y1="20" x2="${xFixed - 10}" y2="30" />
+      <line x1="${xFixed}" y1="35" x2="${xFixed - 10}" y2="45" />
+      <line x1="${xFixed}" y1="50" x2="${xFixed - 10}" y2="60" />
+      <line x1="${xFixed}" y1="65" x2="${xFixed - 10}" y2="75" />
+    </g>
+    <rect x="${xFixed}" y="${yBar}" width="${origLen}" height="${barH}" rx="3" fill="none" stroke="#475569" stroke-dasharray="3,3" />
+    <rect x="${xFixed}" y="${yBar + (N > 0 ? 1 : -1)}" width="${curLen}" height="${barH - (N > 0 ? 2 : -2)}" rx="3" fill="${barColor}" opacity="0.85" />
+  `;
+
+  const xEnd = xFixed + curLen;
+  if (N > 0) {
+    svgHtml += `
+      <line x1="${xEnd}" y1="${yBar + barH/2}" x2="${xEnd + 45}" y2="${yBar + barH/2}" stroke="#38bdf8" stroke-width="3" />
+      <polygon points="${xEnd + 50},${yBar + barH/2} ${xEnd + 38},${yBar + barH/2 - 5} ${xEnd + 38},${yBar + barH/2 + 5}" fill="#38bdf8" />
+      <text x="${xEnd + 8}" y="${yBar - 6}" fill="#38bdf8" font-size="11" font-weight="700">+N (Розтяг)</text>
+    `;
+  } else if (N < 0) {
+    svgHtml += `
+      <line x1="${xEnd + 50}" y1="${yBar + barH/2}" x2="${xEnd + 5}" y2="${yBar + barH/2}" stroke="#f43f5e" stroke-width="3" />
+      <polygon points="${xEnd},${yBar + barH/2} ${xEnd + 12},${yBar + barH/2 - 5} ${xEnd + 12},${yBar + barH/2 + 5}" fill="#f43f5e" />
+      <text x="${xEnd + 8}" y="${yBar - 6}" fill="#f43f5e" font-size="11" font-weight="700">-N (Стиск)</text>
+    `;
+  }
+
+  svg.innerHTML = svgHtml;
+}
+
+/* КАЛЬКУЛЯТОР ПЕРЕРІЗІВ */
+function renderSecCalc() {
+  const type = document.getElementById('calcSecType').value;
+  const container = document.getElementById('secInputs');
+
+  if (type === 'rect') {
+    container.innerHTML = `
+      <div class="control-group">
+        <label>Ширина b [см]: <span class="val" id="valSecB">10 см</span></label>
+        <input type="range" id="inSecB" min="2" max="50" step="1" value="10" oninput="updateSecCalc()">
+      </div>
+      <div class="control-group">
+        <label>Висота h [см]: <span class="val" id="valSecH">20 см</span></label>
+        <input type="range" id="inSecH" min="2" max="80" step="1" value="20" oninput="updateSecCalc()">
+      </div>
+    `;
+  } else if (type === 'circle') {
+    container.innerHTML = `
+      <div class="control-group">
+        <label>Діаметр d [см]: <span class="val" id="valSecD">15 см</span></label>
+        <input type="range" id="inSecD" min="2" max="60" step="1" value="15" oninput="updateSecCalc()">
+      </div>
+    `;
+  } else if (type === 'pipe') {
+    container.innerHTML = `
+      <div class="control-group">
+        <label>Зовнішній D [см]: <span class="val" id="valSecPipeD">20 см</span></label>
+        <input type="range" id="inSecPipeD" min="5" max="60" step="1" value="20" oninput="updateSecCalc()">
+      </div>
+      <div class="control-group">
+        <label>Внутрішній d [см]: <span class="val" id="valSecPiped">16 см</span></label>
+        <input type="range" id="inSecPiped" min="2" max="55" step="1" value="16" oninput="updateSecCalc()">
+      </div>
+    `;
+  } else if (type === 'i-beam') {
+    container.innerHTML = `
+      <div class="control-group">
+        <label>Висота двотавра h [см]: <span class="val" id="valSecIh">24 см</span></label>
+        <input type="range" id="inSecIh" min="10" max="60" step="2" value="24" oninput="updateSecCalc()">
+      </div>
+      <div class="control-group">
+        <label>Ширина полиці b [см]: <span class="val" id="valSecIb">12 см</span></label>
+        <input type="range" id="inSecIb" min="5" max="30" step="1" value="12" oninput="updateSecCalc()">
+      </div>
+    `;
+  }
+
+  updateSecCalc();
+}
+
+function updateSecCalc() {
+  const type = document.getElementById('calcSecType').value;
+  let A = 0, Ix = 0, Wx = 0, ixRad = 0;
+
+  if (type === 'rect') {
+    const b = parseFloat(document.getElementById('inSecB').value);
+    const h = parseFloat(document.getElementById('inSecH').value);
+    document.getElementById('valSecB').innerText = b + ' см';
+    document.getElementById('valSecH').innerText = h + ' см';
+
+    A = b * h;
+    Ix = (b * Math.pow(h, 3)) / 12;
+    Wx = (b * Math.pow(h, 2)) / 6;
+    ixRad = h / Math.sqrt(12);
+
+  } else if (type === 'circle') {
+    const d = parseFloat(document.getElementById('inSecD').value);
+    document.getElementById('valSecD').innerText = d + ' см';
+
+    A = (Math.PI * d * d) / 4;
+    Ix = (Math.PI * Math.pow(d, 4)) / 64;
+    Wx = (Math.PI * Math.pow(d, 3)) / 32;
+    ixRad = d / 4;
+
+  } else if (type === 'pipe') {
+    let D = parseFloat(document.getElementById('inSecPipeD').value);
+    let dInput = document.getElementById('inSecPiped');
+    dInput.max = (D - 1).toString();
+    if (parseFloat(dInput.value) >= D) dInput.value = (D - 1).toString();
+    let d = parseFloat(dInput.value);
+
+    document.getElementById('valSecPipeD').innerText = D + ' см';
+    document.getElementById('valSecPiped').innerText = d + ' см';
+
+    const alpha = d / D;
+    A = (Math.PI * (D * D - d * d)) / 4;
+    Ix = (Math.PI * Math.pow(D, 4) / 64) * (1 - Math.pow(alpha, 4));
+    Wx = (Math.PI * Math.pow(D, 3) / 32) * (1 - Math.pow(alpha, 4));
+    ixRad = Math.sqrt(Ix / A);
+
+  } else if (type === 'i-beam') {
+    const h = parseFloat(document.getElementById('inSecIh').value);
+    const b = parseFloat(document.getElementById('inSecIb').value);
+    document.getElementById('valSecIh').innerText = h + ' см';
+    document.getElementById('valSecIb').innerText = b + ' см';
+
+    const t = 0.08 * h;
+    const s = 0.05 * h;
+    A = 2 * (b * t) + (h - 2 * t) * s;
+    Ix = (b * Math.pow(h, 3) - (b - s) * Math.pow(h - 2 * t, 3)) / 12;
+    Wx = Ix / (h / 2);
+    ixRad = Math.sqrt(Ix / A);
+  }
+
+  document.getElementById('calcResA').innerText = A.toFixed(1) + ' см²';
+  document.getElementById('calcResIx').innerText = Ix.toFixed(1) + ' см⁴';
+  document.getElementById('calcResWx').innerText = Wx.toFixed(1) + ' см³';
+  document.getElementById('calcResIxRad').innerText = ixRad.toFixed(2) + ' см';
+}
+
+function filterMaterialsTable() {
+  const query = document.getElementById('matSearch').value.toLowerCase();
+  const rows = document.querySelectorAll('#matTable tbody tr');
+  rows.forEach(r => {
+    const text = r.innerText.toLowerCase();
+    r.style.display = text.includes(query) ? '' : 'none';
+  });
+}
+
+const quizData = [
+  {
+    q: "1. Чим принципово відрізняється модель тіла в опорі матеріалів від теоретичної механіки?",
+    options: [
+      "В опорматах діють лише статичні сили, а динамічних не буває",
+      "В опорматах тіла деформівні (враховуються їх пружні та пластичні зміни форми)",
+      "В опорматах не діють закони Ньютона",
+      "В опорматах використовують виключно дослідні дані без аналітичних рівнянь"
+    ],
+    correct: 1,
+    explain: "У теоретичній механіці всі тіла вважаються абсолютно твердими. В опорі матеріалів ключовою властивістю є здатність реальних матеріалів пружно й пластично деформуватися."
+  },
+  {
+    q: "2. Згідно з гіпотезою плоских перерізів (Бернуллі), поперечний переріз стрижня після деформації:",
+    options: [
+      "Викривляється за параболою",
+      "Залишається плоским і перпендикулярним до вигнутої осі стрижня",
+      "Перетворюється на хвилясту поверхню",
+      "Збільшує свою площу вдвічі"
+    ],
+    correct: 1,
+    explain: "Гіпотеза Бернуллі постулює, що перерізи, плоскі до деформації, залишаються плоскими й нормальними до осі стрижня після вигину."
+  },
+  {
+    q: "3. Що показує епюра внутрішніх зусиль (наприклад, епюра Q або M)?",
+    options: [
+      "Траєкторію зміщення осі балки в просторі",
+      "Графік розподілу внутрішнього силового фактора вздовж осі конструкції",
+      "Швидкість охолодження деталі",
+      "Розподіл температури всередині матеріалу"
+    ],
+    correct: 1,
+    explain: "Епюра — це графік, ординати якого в кожному перерізі показують точне значення внутрішнього силового фактора (N, Q, M чи T)."
+  },
+  {
+    q: "4. Як пов'язані згинальний момент M(x) та поперечна сила Q(x) за теоремою Журавського?",
+    options: [
+      "Q(x) є похідною від моменту: dM/dx = Q",
+      "M(x) завжди дорівнює Q(x)",
+      "Q(x) є другою похідною від моменту",
+      "Вони не пов'язані між собою"
+    ],
+    correct: 0,
+    explain: "Диференціальна залежність Журавського: dM/dx = Q. Це означає, що в точці, де поперечна сила дорівнює нулю (Q = 0), момент має екстремум!"
+  },
+  {
+    q: "5. Де виникають максимальні нормальні напруження при чистому згині прямокутної балки?",
+    options: [
+      "Точно на нейтральній лінії (в центрі ваги)",
+      "У найбільш віддалених від нейтральної осі крайніх волокнах",
+      "Рівномірно по всій площі перерізу",
+      "Тільки в точках кріплення опор"
+    ],
+    correct: 1,
+    explain: "За формулою Нав'є: σ = (M · y) / Ix. Напруження прямо пропорційні відстані y від нейтральної осі. На крайніх волокнах (y = h/2) напруження максимальні."
+  },
+  {
+    q: "6. Як зміниться видовження стрижня ΔL, якщо площу його перерізу A збільшити в 2 рази?",
+    options: [
+      "Збільшиться в 2 рази",
+      "Зменшиться в 2 рази",
+      "Залишиться без змін",
+      "Зменшиться в 4 рази"
+    ],
+    correct: 1,
+    explain: "За законом Гука: ΔL = (N · L) / (E · A). Площа знаходиться в знаменнику, тому збільшення площі в 2 рази зменшує видовження вдвічі."
+  },
+  {
+    q: "7. Яке явище визначає формула Ейлера P_кр = (π² · E · I_min) / (μ · L)²?",
+    options: [
+      "Втому металу при циклічних навантаженнях",
+      "Критичну силу втрати стійкості тонкого стиснутого стрижня",
+      "Температурне розширення",
+      "Руйнування при ударному навантаженні"
+    ],
+    correct: 1,
+    explain: "Формула Ейлера визначає критичну стискальну силу, при якій прямий довгий стрижень раптово втрачає прямолінійну форму рівноваги (поздовжній згин)."
+  }
+];
+
+function initQuiz() {
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = quizData.map((item, qIdx) => `
+    <div class="card" id="quizCard_${qIdx}">
+      <h3 style="font-size: 1.05rem; margin-bottom: 0.85rem; color: var(--text-primary);">${item.q}</h3>
+      <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+        ${item.options.map((opt, optIdx) => `
+          <div class="quiz-option" onclick="handleQuizAnswer(${qIdx}, ${optIdx}, this)">
+            <span style="font-weight: 700; color: var(--accent-blue);">${String.fromCharCode(65 + optIdx)}.</span>
+            <span>${opt}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback" id="quizFeedback_${qIdx}"></div>
+    </div>
+  `).join('');
+}
+
+function handleQuizAnswer(qIdx, selectedIdx, elem) {
+  const card = document.getElementById('quizCard_' + qIdx);
+  const feedback = document.getElementById('quizFeedback_' + qIdx);
+  const qItem = quizData[qIdx];
+
+  const allOpts = card.querySelectorAll('.quiz-option');
+  allOpts.forEach(o => o.style.pointerEvents = 'none');
+
+  if (selectedIdx === qItem.correct) {
+    elem.classList.add('correct');
+    feedback.style.display = 'block';
+    feedback.style.background = 'rgba(52, 211, 153, 0.15)';
+    feedback.style.border = '1px solid var(--accent-emerald)';
+    feedback.style.color = '#a7f3d0';
+    feedback.innerHTML = `<strong>✔ Вірно!</strong> ${qItem.explain}`;
+  } else {
+    elem.classList.add('wrong');
+    allOpts[qItem.correct].classList.add('correct');
+    feedback.style.display = 'block';
+    feedback.style.background = 'rgba(244, 63, 94, 0.15)';
+    feedback.style.border = '1px solid var(--accent-rose)';
+    feedback.style.color = '#fecdd3';
+    feedback.innerHTML = `<strong>✖ Неправильно.</strong> Правильна відповідь: <strong>${String.fromCharCode(65 + qItem.correct)}</strong>.<br>${qItem.explain}`;
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderTensionShapeInputs();
+  renderSecCalc();
+  updateBeamSim();
+  updateTensionSim();
+  initQuiz();
+});
+</script>
+</body>
+</html>
+
